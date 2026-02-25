@@ -27,3 +27,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - CLAUDE.md mit Projektübersicht und Entwicklungs-Konventionen
+
+## [1.1.0] - 2026-02-25
+
+### Added
+- PHPUnit 11 Test-Suite: 84 Tests, 220 Assertions (DTO, Exception, DeezerClient)
+- Tests für alle DTOs: Album, Artist, Track, Genre, Release
+- Tests für Exception-Hierarchie: RateLimitException, ApiException, NotFoundException
+- DeezerClient-Tests mit Guzzle MockHandler (429-Handling, Error-Body, JSON-Fehler)
+
+### Fixed
+- phpunit.xml auf aktuelles Schema migriert (Deprecation-Warning entfernt)
