@@ -1,71 +1,63 @@
 {
     "name": "four-bytes/deezer-api-client",
-    "description": "Modern PHP 8.4+ API client for Deezer Public API with rate limiting and caching",
+    "description": "PHP 8.4+ client for the Deezer API — built on four-http-client",
     "type": "library",
     "license": "MIT",
-    "keywords": [
-        "deezer",
-        "api-client",
-        "music",
-        "streaming",
-        "rate-limiting"
-    ],
-    "authors": [
-        {
-            "name": "Four Bytes",
-            "homepage": "https://github.com/four-bytes"
-        }
-    ],
+    "keywords": ["deezer", "api-client", "music", "streaming"],
+    "authors": [{"name": "Four Bytes", "homepage": "https://github.com/four-bytes"}],
     "require": {
         "php": "^8.4",
-        "psr/http-client": "^1.0",
-        "psr/http-factory": "^1.0",
-        "psr/http-message": "^2.0",
+        "four-bytes/four-http-client": "^4.0",
+        "four-bytes/four-rate-limiting": "^1.3",
         "psr/cache": "^3.0",
-        "psr/log": "^3.0",
-        "php-http/discovery": "^1.19"
+        "psr/log": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^11.0",
         "phpstan/phpstan": "^2.0",
-        "squizlabs/php_codesniffer": "^3.10",
-        "guzzlehttp/guzzle": "^7.8",
-        "guzzlehttp/psr7": "^2.6",
+        "nyholm/psr7": "^1.8",
+        "php-http/mock-client": "^1.6",
         "symfony/cache": "^7.2"
     },
     "suggest": {
-        "guzzlehttp/guzzle": "For using Guzzle as HTTP client",
-        "symfony/cache": "For PSR-6 cache implementation",
-        "four-bytes/four-rate-limiting": "For advanced rate limiting with marketplace presets"
+        "symfony/http-client": "PSR-18 HTTP transport",
+        "symfony/cache": "PSR-6 cache implementation for label caching"
     },
     "autoload": {
-        "psr-4": {
-            "Four\\Deezer\\": "src/"
-        }
+        "psr-4": {"Four\\Deezer\\": "src/"}
     },
     "autoload-dev": {
-        "psr-4": {
-            "Four\\Deezer\\Tests\\": "tests/"
-        }
+        "psr-4": {"Four\\Deezer\\Tests\\": "tests/"}
     },
     "repositories": [
         {
             "type": "path",
-            "url": "/home/robby/four-rate-limiting"
+            "url": "/home/robby/four-api-clients/four-http-client",
+            "options": {
+                "versions": {
+                    "four-bytes/four-http-client": "4.0.0"
+                }
+            }
+        },
+        {
+            "type": "path",
+            "url": "/home/robby/four-rate-limiting",
+            "options": {
+                "versions": {
+                    "four-bytes/four-rate-limiting": "1.3.0"
+                }
+            }
         }
     ],
-    "scripts": {
-        "test": "phpunit",
-        "phpstan": "phpstan analyse src --level=8",
-        "cs-check": "phpcs --standard=PSR12 src",
-        "cs-fix": "phpcbf --standard=PSR12 src"
-    },
     "config": {
         "sort-packages": true,
-        "allow-plugins": {
-            "php-http/discovery": true
-        }
+        "allow-plugins": {"php-http/discovery": true}
     },
     "minimum-stability": "stable",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan analyse src tests",
+        "quality": ["@phpstan", "@test"]
+    }
 }

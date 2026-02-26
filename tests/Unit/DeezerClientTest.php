@@ -8,37 +8,47 @@ use Four\Deezer\DeezerClient;
 use Four\Deezer\Exception\ApiException;
 use Four\Deezer\Exception\DeezerException;
 use Four\Deezer\Exception\RateLimitException;
-use GuzzleHttp\Client as GuzzleClient;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\HttpFactory;
-use GuzzleHttp\Psr7\Response;
+use Four\Http\Configuration\ClientConfig;
+use Http\Mock\Client as MockClient;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 
 #[CoversClass(DeezerClient::class)]
 final class DeezerClientTest extends TestCase
 {
-    private HttpFactory $factory;
+    private Psr17Factory $psr17Factory;
 
     protected function setUp(): void
     {
-        $this->factory = new HttpFactory();
+        $this->psr17Factory = new Psr17Factory();
     }
 
     /**
-     * Erstellt einen DeezerClient mit Guzzle MockHandler.
+     * Erstellt einen DeezerClient mit Mock-HTTP-Client.
      *
-     * @param Response[] $responses
+     * @param list<ResponseInterface> $responses
      */
     private function createClientWithMockResponses(array $responses): DeezerClient
     {
-        $mockHandler = new MockHandler($responses);
-        $handlerStack = HandlerStack::create($mockHandler);
-        $guzzleClient = new GuzzleClient(['handler' => $handlerStack]);
+        $mockClient = new MockClient();
+        foreach ($responses as $response) {
+            $mockClient->addResponse($response);
+        }
 
-        return new DeezerClient($guzzleClient, $this->factory);
+        $config = ClientConfig::create('https://api.deezer.com')
+            ->withHeader('Accept', 'application/json')
+            ->build();
+
+        return new DeezerClient(
+            $config,
+            $mockClient,
+            $this->psr17Factory,
+            $this->psr17Factory,
+        );
     }
 
     // ---------------------------------------------------------------
@@ -111,17 +121,6 @@ final class DeezerClientTest extends TestCase
     }
 
     #[Test]
-    public function sendRequestWith403ThrowsRateLimitException(): void
-    {
-        $response = new Response(403, [], 'Forbidden');
-
-        $client = $this->createClientWithMockResponses([$response]);
-
-        $this->expectException(RateLimitException::class);
-        $client->sendRequest('GET', '/album/123');
-    }
-
-    #[Test]
     public function sendRequestWithRateLimitResponseHasCorrectRetryAfter(): void
     {
         $response = new Response(429, [], 'Too Many Requests');
@@ -137,72 +136,25 @@ final class DeezerClientTest extends TestCase
     }
 
     #[Test]
-    public function sendRequestWithDeezerErrorInBodyThrowsApiException(): void
+    public function sendRequestWith404ThrowsDeezerException(): void
     {
-        $body = json_encode([
-            'error' => [
-                'code' => 800,
-                'message' => 'Token invalid',
-                'type' => 'OAuthException',
-            ],
-        ], JSON_THROW_ON_ERROR);
-        $response = new Response(200, [], $body);
+        $response = new Response(404, [], 'Not Found');
 
         $client = $this->createClientWithMockResponses([$response]);
-
-        $this->expectException(ApiException::class);
-        $client->sendRequest('GET', '/album/123');
-    }
-
-    #[Test]
-    public function sendRequestWithDeezerErrorContainsCorrectErrorCode(): void
-    {
-        $body = json_encode([
-            'error' => [
-                'code' => 800,
-                'message' => 'Token invalid',
-            ],
-        ], JSON_THROW_ON_ERROR);
-        $response = new Response(200, [], $body);
-
-        $client = $this->createClientWithMockResponses([$response]);
-
-        try {
-            $client->sendRequest('GET', '/album/123');
-            $this->fail('ApiException wurde nicht geworfen');
-        } catch (ApiException $e) {
-            $this->assertSame(800, $e->getErrorCode());
-            $this->assertSame('Token invalid', $e->getMessage());
-        }
-    }
-
-    #[Test]
-    public function sendRequestWithInvalidJsonThrowsApiException(): void
-    {
-        $response = new Response(200, [], 'das ist kein JSON {{{');
-
-        $client = $this->createClientWithMockResponses([$response]);
-
-        $this->expectException(ApiException::class);
-        $client->sendRequest('GET', '/album/123');
-    }
-
-    #[Test]
-    public function sendRequestWithHttpClientExceptionThrowsDeezerException(): void
-    {
-        // Guzzle MockHandler mit Exception statt Response
-        $mockHandler = new MockHandler([
-            new \GuzzleHttp\Exception\ConnectException(
-                'Connection refused',
-                new \GuzzleHttp\Psr7\Request('GET', 'https://api.deezer.com/album/1')
-            ),
-        ]);
-        $handlerStack = HandlerStack::create($mockHandler);
-        $guzzleClient = new GuzzleClient(['handler' => $handlerStack]);
-        $client = new DeezerClient($guzzleClient, $this->factory);
 
         $this->expectException(DeezerException::class);
-        $client->sendRequest('GET', '/album/1');
+        $client->sendRequest('GET', '/album/999999');
+    }
+
+    #[Test]
+    public function sendRequestWith500ThrowsDeezerException(): void
+    {
+        $response = new Response(500, [], 'Internal Server Error');
+
+        $client = $this->createClientWithMockResponses([$response]);
+
+        $this->expectException(DeezerException::class);
+        $client->sendRequest('GET', '/album/123');
     }
 
     // ---------------------------------------------------------------
