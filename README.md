@@ -14,12 +14,7 @@ Modern PHP 8.4+ API client for the **Deezer Public API** with rate limiting and 
 ## Installation
 
 ```bash
-composer require four-bytes/deezer-api-client
-```
-
-For rate limiting support:
-```bash
-composer require four-bytes/four-rate-limiting
+composer require four-bytes/four-deezer-api-client
 ```
 
 ## Quick Start
@@ -205,5 +200,4 @@ MIT License. See [LICENSE](LICENSE) for details.
 ## Related Libraries
 
 - `four-bytes/four-rate-limiting` - Rate limiting with marketplace presets
-- `four-bytes/four-marketplace-http` - HTTP client factory for marketplaces
-- `four-bytes/gs1-germany-api-client` - GS1 Germany API client
+- `four-bytes/four-http-client` - PSR-18 HTTP client with middleware support
