@@ -1,5 +1,5 @@
 {
-    "name": "four-bytes/deezer-api-client",
+    "name": "four-bytes/four-deezer-api-client",
     "description": "PHP 8.4+ client for the Deezer API — built on four-http-client",
     "type": "library",
     "license": "MIT",
