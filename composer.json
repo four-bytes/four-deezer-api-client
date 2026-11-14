@@ -1,9 +1,15 @@
 {
     "name": "four-bytes/four-deezer-api-client",
-    "description": "PHP 8.4+ client for the Deezer API — built on four-http-client",
+    "description": "PHP 8.4+ client for the Deezer API with rate limiting and caching — built on four-http-client",
     "type": "library",
     "license": "MIT",
-    "keywords": ["deezer", "api-client", "music", "streaming"],
+    "keywords": [
+        "deezer",
+        "api-client",
+        "music",
+        "streaming",
+        "php"
+    ],
     "authors": [{"name": "Four Bytes", "homepage": "https://github.com/four-bytes"}],
     "require": {
         "php": "^8.4",
