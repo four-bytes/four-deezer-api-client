@@ -41,7 +41,7 @@
         },
         {
             "type": "path",
-            "url": "/home/robby/four-rate-limiting",
+            "url": "/home/robby/four-api-clients/four-rate-limiting",
             "options": {
                 "versions": {
                     "four-bytes/four-rate-limiting": "1.3.0"
