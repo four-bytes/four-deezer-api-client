@@ -38,3 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - phpunit.xml auf aktuelles Schema migriert (Deprecation-Warning entfernt)
+
+## [1.2.1] - 2026-11-14
+
+### Changed
+- `four-bytes/four-http-client` `^4.0 || ^5.0` — installable together with packages that need v5; tests pass against v4.2.1 and v5.0.1 (#8)
